@@ -5,7 +5,7 @@
  * ═══════════════════════════════════════════════════════
  */
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://genai-ztl4.onrender.com/";
 
 // ─── State ───
 const state = {
