@@ -1,9 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "package.json", "use": "@vercel/static" }
-  ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "http://localhost:8000/:1" } 
+    {
+      "source": "/api/:match*",
+      "destination": "https://genai-ztl4.onrender.com/:match*"
+    }
   ]
 }
