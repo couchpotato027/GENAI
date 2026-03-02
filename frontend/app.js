@@ -1,22 +1,26 @@
 /**
- * ═══════════════════════════════════════════════════════
  * Intelligent Exam Question Analysis
  * Frontend Logic — Milestone 1 (Classical ML)
- * ═══════════════════════════════════════════════════════
  */
 
 const API_BASE_URL = "https://genai-ztl4.onrender.com";
 
-// ─── State ───
+// State
 const state = {
+    currentMode: "analytics",
     analysisComplete: false,
     analysisData: null,
 };
 
-// ─── DOM References ───
+// DOM References
 const dom = {
+    // Nav
+    btnAnalytics: document.getElementById("btnAnalytics"),
+    btnAboutUs: document.getElementById("btnAboutUs"),
+
     // Panels
     analyticsPanel: document.getElementById("analyticsPanel"),
+    aboutPanel: document.getElementById("aboutPanel"),
 
     // Input
     questionText: document.getElementById("questionText"),
@@ -51,32 +55,28 @@ const dom = {
 
 
 // ═══════════════════════════════════════════════
+// PAGE SWITCHING (Analytics / About Us)
+// ═══════════════════════════════════════════════
+function switchMode(mode) {
+    state.currentMode = mode;
+
+    dom.btnAnalytics.classList.toggle("active", mode === "analytics");
+    dom.btnAboutUs.classList.toggle("active", mode === "about");
+
+    dom.analyticsPanel.style.display = mode === "analytics" ? "block" : "none";
+    dom.aboutPanel.style.display = mode === "about" ? "block" : "none";
+}
+
+dom.btnAnalytics.addEventListener("click", () => switchMode("analytics"));
+dom.btnAboutUs.addEventListener("click", () => switchMode("about"));
+
+
+// ═══════════════════════════════════════════════
 // FILE UPLOAD
 // ═══════════════════════════════════════════════
 dom.browseLink.addEventListener("click", (e) => {
     e.preventDefault();
     dom.csvUpload.click();
-});
-
-// ═══════════════════════════════════════════════
-// ABOUT US MODAL
-// ═══════════════════════════════════════════════
-const aboutModal = document.getElementById("aboutModal");
-const btnAboutUs = document.getElementById("btnAboutUs");
-const closeAbout = document.getElementById("closeAbout");
-
-btnAboutUs.addEventListener("click", () => {
-    aboutModal.style.display = "flex";
-});
-
-closeAbout.addEventListener("click", () => {
-    aboutModal.style.display = "none";
-});
-
-aboutModal.addEventListener("click", (e) => {
-    if (e.target === aboutModal) {
-        aboutModal.style.display = "none";
-    }
 });
 
 dom.fileUploadArea.addEventListener("click", () => {
@@ -124,22 +124,15 @@ dom.removeFile.addEventListener("click", (e) => {
 
 
 // ═══════════════════════════════════════════════
-// ML ANALYSIS — Strict Validation & Computation
+// ML ANALYSIS — Validation
 // ═══════════════════════════════════════════════
 
-/**
- * Returns true only when the user has supplied real student score data.
- * Accepts either a non-empty manual scores string or a CSV file upload.
- */
 function hasStudentData() {
     const manualFilled = dom.manualScores.value.trim().length > 0;
     const csvUploaded = dom.csvUpload.files && dom.csvUpload.files.length > 0;
     return manualFilled || csvUploaded;
 }
 
-/**
- * Show or hide the inline validation warning.
- */
 function setWarning(message) {
     let warningEl = document.getElementById("dataWarning");
     if (!warningEl) return;
@@ -152,10 +145,6 @@ function setWarning(message) {
     }
 }
 
-/**
- * Update the Run ML Analysis button's disabled state based on
- * whether student data is currently present.
- */
 function refreshButtonState() {
     const dataPresent = hasStudentData();
     dom.btnRunAnalysis.disabled = !dataPresent;
@@ -164,11 +153,6 @@ function refreshButtonState() {
     }
 }
 
-/**
- * Parse and validate the raw scores string.
- * Throws a descriptive Error if the data is missing or unparseable.
- * IMPORTANT: No fallback values are ever generated here.
- */
 function parseScores(scoresStr) {
     const scores = scoresStr
         .split(",")
@@ -179,63 +163,45 @@ function parseScores(scoresStr) {
         throw new Error("No valid numeric scores found. Scores must be comma-separated numbers between 0 and 100.");
     }
     if (scores.length < 3) {
-        throw new Error(`Only ${scores.length} valid score(s) provided. At least 3 student responses are required for meaningful analysis.`);
+        throw new Error(`Only ${scores.length} valid score(s) provided. At least 3 student responses are required.`);
     }
     return scores;
 }
 
-/**
- * Detect whether scores are binary (0/1 only) or continuous (0–100 marks).
- * Returns true if every score is exactly 0 or exactly 1.
- */
 function isBinary(scores) {
     return scores.every(s => s === 0 || s === 1);
 }
 
-/**
- * Configurable pass threshold for continuous scores.
- * Faculty can adjust this value as needed.
- */
 const PASS_THRESHOLD = 50;
 
-/**
- * Run Analysis via Backend API
- */
 async function runAnalysis(questionText, scoresStr) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/predict`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question: questionText, student_scores: scoresStr })
-        });
+    const response = await fetch(`${API_BASE_URL}/predict`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: questionText, student_scores: scoresStr })
+    });
 
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.statusText}`);
-        }
-
-        const res = await response.json();
-
-        // Map backend response to frontend data model
-        return {
-            question: questionText,
-            difficulty: res.predicted_difficulty,
-            confidence: res.confidence,
-            avgScore: res.avg_score.toFixed(1),
-            rateValue: res.pass_rate.toFixed(1),
-            metricLabel: "Pass Rate (≥50%)",
-            variance: res.variance.toFixed(1),
-            discIndex: res.disc_index
-        };
-    } catch (err) {
-        throw err;
+    if (!response.ok) {
+        throw new Error(`API Error: ${response.statusText}`);
     }
+
+    const res = await response.json();
+
+    return {
+        question: questionText,
+        difficulty: res.predicted_difficulty,
+        confidence: res.confidence,
+        avgScore: res.avg_score.toFixed(1),
+        rateValue: res.pass_rate.toFixed(1),
+        metricLabel: "Pass Rate",
+        variance: res.variance.toFixed(1),
+        discIndex: res.disc_index
+    };
 }
 
 
 // ═══════════════════════════════════════════════
-// OFFLINE MODEL EVALUATION (Static Constants)
-// These are computed once during model training/validation
-// and NEVER recomputed from live user input.
+// OFFLINE MODEL EVALUATION (Static)
 // ═══════════════════════════════════════════════
 const OFFLINE_MODEL_EVAL = Object.freeze({
     accuracy: "0.9500",
@@ -248,10 +214,6 @@ const OFFLINE_MODEL_EVAL = Object.freeze({
     ]),
 });
 
-/**
- * Populate the evaluation UI once at page load from
- * the frozen offline constants.
- */
 function populateOfflineEval() {
     dom.evalAccuracy.textContent = OFFLINE_MODEL_EVAL.accuracy;
     dom.evalPrecision.textContent = OFFLINE_MODEL_EVAL.precision;
@@ -267,65 +229,52 @@ function populateOfflineEval() {
     }
 }
 
-// Initialise offline eval values immediately
 populateOfflineEval();
 
-// ─── Live button-state watcher ───
-// Disable the button whenever student data is absent.
+// Live button-state watcher
 dom.manualScores.addEventListener("input", refreshButtonState);
 dom.csvUpload.addEventListener("change", refreshButtonState);
 dom.removeFile.addEventListener("click", () => setTimeout(refreshButtonState, 0));
-
-// Initialise: button starts disabled until data is provided
 refreshButtonState();
 
-// ─── Run ML Analysis click handler ───
+// Run ML Analysis click handler
 dom.btnRunAnalysis.addEventListener("click", async () => {
     const question = dom.questionText.value.trim();
 
-    // Guard 1: question text is mandatory
     if (!question) {
         setWarning("Exam question text is required.");
         dom.questionText.focus();
         return;
     }
 
-    // Guard 2: student data is mandatory — no silent fallback
     if (!hasStudentData()) {
         setWarning("Student response data is required to run ML analysis.");
         return;
     }
 
-    // Determine which source to use (manual takes priority over CSV for now)
     const scoresStr = dom.manualScores.value.trim();
 
-    // UI Loading State
     const originalText = dom.btnRunAnalysis.textContent;
     dom.btnRunAnalysis.textContent = "Analyzing...";
     dom.btnRunAnalysis.disabled = true;
 
     try {
         const data = await runAnalysis(question, scoresStr);
-
-        // All guards passed — clear any previous warning
         setWarning(null);
 
         state.analysisData = data;
         state.analysisComplete = true;
 
-        // Populate results
         dom.resDifficulty.textContent = data.difficulty;
         dom.resDifficulty.className = "card-value difficulty-badge " + data.difficulty.toLowerCase();
         dom.resConfidence.textContent = (data.confidence * 100).toFixed(0) + "%";
         dom.confidenceFill.style.width = (data.confidence * 100) + "%";
         dom.resAvgScore.textContent = data.avgScore;
 
-        // Dynamic label
         document.getElementById("resPctLabel").textContent = data.metricLabel;
         dom.resPctCorrect.textContent = data.rateValue + "%";
         dom.resVariance.textContent = data.variance;
 
-        // Show sections (eval metrics are already populated from offline constants)
         dom.resultsSection.style.display = "block";
         dom.evalSection.style.display = "block";
 

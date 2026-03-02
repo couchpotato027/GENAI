@@ -16,37 +16,27 @@
 
 <body>
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- TOP NAVIGATION BAR                         -->
-    <!-- ═══════════════════════════════════════════ -->
+    <!-- TOP NAVIGATION BAR -->
     <nav class="top-nav" id="topNav">
         <div class="nav-left">
-            <h1 class="app-title">
-                <span class="logo-box">🧠</span>
-                Intelligent Exam Analysis
-            </h1>
-            <span class="app-subtitle">Milestone 1 — Classical ML</span>
+            <h1 class="app-title">Intelligent Exam Analysis</h1>
+            <span class="app-subtitle">Milestone 1</span>
         </div>
         <div class="nav-right">
             <div class="mode-toggle">
                 <button class="mode-btn active" id="btnAnalytics" data-mode="analytics">
-                    <span class="mode-icon">🟢</span>
-                    Analytics Mode
-                    <span class="mode-label">Milestone 1</span>
+                    &#9679; Analytics Mode
+                </button>
+                <button class="mode-btn" id="btnAboutUs" data-mode="about">
+                    &#8505; About Us
                 </button>
             </div>
-            <button class="mode-btn about-btn" id="btnAboutUs">
-                <span class="mode-icon">👥</span>
-                About Us
-            </button>
         </div>
     </nav>
 
     <main class="main-content">
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- 🟢 ANALYTICS MODE (MILESTONE 1)            -->
-        <!-- ═══════════════════════════════════════════ -->
+        <!-- ANALYTICS MODE (MILESTONE 1) -->
         <div class="mode-panel" id="analyticsPanel">
 
             <!-- Section 1: Input Panel -->
@@ -65,14 +55,14 @@
                         <div class="file-upload-area" id="fileUploadArea">
                             <input type="file" id="csvUpload" accept=".csv" hidden>
                             <div class="upload-placeholder" id="uploadPlaceholder">
-                                <span class="upload-icon">📁</span>
-                                <p>Drag & drop a CSV file here, or <a href="#" id="browseLink">browse</a></p>
+                                <span class="upload-icon">&#128194;</span>
+                                <p>Drag &amp; drop a CSV file here, or <a href="#" id="browseLink">browse</a></p>
                                 <span class="upload-hint">Expected columns: student_id, score</span>
                             </div>
                             <div class="upload-success" id="uploadSuccess" style="display:none;">
-                                <span class="success-icon">✅</span>
+                                <span class="success-icon">&#10003;</span>
                                 <span class="file-name" id="fileName"></span>
-                                <button class="btn-remove" id="removeFile">✕</button>
+                                <button class="btn-remove" id="removeFile">&#10005;</button>
                             </div>
                         </div>
                         <div class="manual-input-toggle">
@@ -82,7 +72,7 @@
                     </div>
                 </div>
                 <button class="btn-primary" id="btnRunAnalysis" disabled>
-                    <span class="btn-icon">▶</span>
+                    <span class="btn-icon">&#9654;</span>
                     Run ML Analysis
                 </button>
                 <div class="data-warning" id="dataWarning" style="display:none;"></div>
@@ -97,35 +87,35 @@
                 <div class="results-grid">
                     <div class="result-card primary-card">
                         <span class="card-label">Predicted Difficulty</span>
-                        <span class="card-value difficulty-badge" id="resDifficulty">—</span>
+                        <span class="card-value difficulty-badge" id="resDifficulty">&mdash;</span>
                     </div>
                     <div class="result-card">
                         <span class="card-label">Confidence Score</span>
-                        <span class="card-value" id="resConfidence">—</span>
+                        <span class="card-value" id="resConfidence">&mdash;</span>
                         <div class="confidence-bar">
                             <div class="confidence-fill" id="confidenceFill"></div>
                         </div>
                     </div>
                     <div class="result-card">
                         <span class="card-label">Average Score</span>
-                        <span class="card-value" id="resAvgScore">—</span>
+                        <span class="card-value" id="resAvgScore">&mdash;</span>
                     </div>
                     <div class="result-card">
                         <span class="card-label" id="resPctLabel">Percentage Correct</span>
-                        <span class="card-value" id="resPctCorrect">—</span>
+                        <span class="card-value" id="resPctCorrect">&mdash;</span>
                     </div>
                     <div class="result-card">
                         <span class="card-label">Variance</span>
-                        <span class="card-value" id="resVariance">—</span>
+                        <span class="card-value" id="resVariance">&mdash;</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Section 3: Model Evaluation — Offline (Expandable) -->
+            <!-- Section 3: Model Evaluation (Expandable) -->
             <section class="section eval-section" id="evalSection" style="display:none;">
                 <div class="section-header expandable-header" id="evalToggle">
                     <h2>Model Evaluation <span class="eval-offline-tag">(Offline Validation Dataset)</span></h2>
-                    <span class="expand-icon" id="expandIcon">▼</span>
+                    <span class="expand-icon" id="expandIcon">&#9660;</span>
                 </div>
                 <p class="eval-disclaimer">These metrics were computed using a held-out labeled dataset during model
                     training and validation. They do not correspond to the current question input.</p>
@@ -133,15 +123,15 @@
                     <div class="eval-grid">
                         <div class="eval-card">
                             <span class="eval-label">Accuracy</span>
-                            <span class="eval-value" id="evalAccuracy">—</span>
+                            <span class="eval-value" id="evalAccuracy">&mdash;</span>
                         </div>
                         <div class="eval-card">
                             <span class="eval-label">Precision</span>
-                            <span class="eval-value" id="evalPrecision">—</span>
+                            <span class="eval-value" id="evalPrecision">&mdash;</span>
                         </div>
                         <div class="eval-card">
                             <span class="eval-label">Recall</span>
-                            <span class="eval-value" id="evalRecall">—</span>
+                            <span class="eval-value" id="evalRecall">&mdash;</span>
                         </div>
                     </div>
                     <div class="confusion-matrix-container">
@@ -158,28 +148,28 @@
                             <tbody>
                                 <tr>
                                     <td class="row-label">Actual: Easy</td>
-                                    <td id="cm00">—</td>
-                                    <td id="cm01">—</td>
-                                    <td id="cm02">—</td>
+                                    <td id="cm00">&mdash;</td>
+                                    <td id="cm01">&mdash;</td>
+                                    <td id="cm02">&mdash;</td>
                                 </tr>
                                 <tr>
                                     <td class="row-label">Actual: Medium</td>
-                                    <td id="cm10">—</td>
-                                    <td id="cm11">—</td>
-                                    <td id="cm12">—</td>
+                                    <td id="cm10">&mdash;</td>
+                                    <td id="cm11">&mdash;</td>
+                                    <td id="cm12">&mdash;</td>
                                 </tr>
                                 <tr>
                                     <td class="row-label">Actual: Hard</td>
-                                    <td id="cm20">—</td>
-                                    <td id="cm21">—</td>
-                                    <td id="cm22">—</td>
+                                    <td id="cm20">&mdash;</td>
+                                    <td id="cm21">&mdash;</td>
+                                    <td id="cm22">&mdash;</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <p class="method-note">
-                    📌 This analysis uses classical machine learning (TF-IDF + Logistic Regression / Decision Tree). No
+                    This analysis uses classical machine learning (TF-IDF + Logistic Regression / Decision Tree). No
                     LLMs are used in this stage. Live outputs (Difficulty, Confidence, Average Score, Pass Rate,
                     Variance) are computed from current input. Accuracy, Precision, Recall, and the Confusion Matrix
                     reflect offline model performance on a held-out validation set.
@@ -187,40 +177,66 @@
             </section>
         </div>
 
+        <!-- ABOUT US PAGE -->
+        <div class="mode-panel" id="aboutPanel" style="display:none;">
+
+            <section class="section about-section">
+                <div class="section-header">
+                    <h2>About This Project</h2>
+                    <p class="section-desc">Intelligent Exam Question Analysis &mdash; Milestone 1</p>
+                </div>
+                <p class="about-text">
+                    This project is a machine learning-based analytics system that predicts exam question difficulty
+                    using classical ML techniques. It accepts exam question text along with student response data,
+                    extracts text and numeric features using TF-IDF vectorization and statistical measures,
+                    and classifies question difficulty as Easy, Medium, or Hard.
+                </p>
+                <div class="about-tech">
+                    <div class="tech-tag">Scikit-learn</div>
+                    <div class="tech-tag">TF-IDF</div>
+                    <div class="tech-tag">Logistic Regression</div>
+                    <div class="tech-tag">Decision Trees</div>
+                    <div class="tech-tag">FastAPI</div>
+                    <div class="tech-tag">SciQ Dataset</div>
+                </div>
+            </section>
+
+            <section class="section about-section">
+                <div class="section-header">
+                    <h2>Meet the Team</h2>
+                    <p class="section-desc">The developers behind this project</p>
+                </div>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <img src="photos/priyansh.jpeg" alt="Priyansh Satija" class="team-photo">
+                        <h3>Priyansh Satija</h3>
+                        <p class="team-role">ML Engineer &amp; Backend Developer</p>
+                        <p class="team-desc">
+                            Responsible for the core ML pipeline, feature engineering,
+                            model training, and the FastAPI backend architecture.
+                        </p>
+                    </div>
+                    <div class="team-member">
+                        <img src="photos/bhavay.jpeg" alt="Bhavay Goyal" class="team-photo">
+                        <h3>Bhavay Goyal</h3>
+                        <p class="team-role">Frontend Developer &amp; UI Designer</p>
+                        <p class="team-desc">
+                            Responsible for the frontend interface, user experience design,
+                            and deployment pipeline for Vercel and Render.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
     </main>
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- FOOTER                                     -->
-    <!-- ═══════════════════════════════════════════ -->
+    <!-- FOOTER -->
     <footer class="app-footer">
-        <p>This system uses classical ML-based educational analytics for exam question difficulty prediction.</p>
-        <p>Built using Scikit-learn, TF-IDF, and Logistic Regression.</p>
+        <p>Classical ML-based educational analytics for exam question difficulty prediction.</p>
+        <p>Built with Scikit-learn, TF-IDF, and Logistic Regression.</p>
     </footer>
-
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- ABOUT US MODAL                             -->
-    <!-- ═══════════════════════════════════════════ -->
-    <div class="modal-overlay" id="aboutModal" style="display:none;">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h2>About Us</h2>
-                <button class="modal-close" id="closeAbout">✕</button>
-            </div>
-            <p class="modal-desc">The team behind Intelligent Exam Question Analysis</p>
-            <div class="team-grid">
-                <div class="team-member">
-                    <img src="photos/priyansh.jpeg" alt="Priyansh Satija" class="team-photo">
-                    <h3>Priyansh Satija</h3>
-                    <p class="team-role">ML Engineer & Backend Developer</p>
-                </div>
-                <div class="team-member">
-                    <img src="photos/bhavay.jpeg" alt="Bhavay Goyal" class="team-photo">
-                    <h3>Bhavay Goyal</h3>
-                    <p class="team-role">Frontend Developer & UI Designer</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="app.js"></script>
 </body>
