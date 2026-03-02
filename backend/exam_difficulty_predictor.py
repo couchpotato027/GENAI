@@ -440,15 +440,7 @@ def predict_difficulty(
     return label, confidence, avg_score, variance, pass_rate
 
 
-# ──────────────────────────────────────────────
-# Agent imports (for the full pipeline demo)
-# ──────────────────────────────────────────────
 
-from assessment_agent import AssessmentAnalysisAgent
-from pedagogical_agent import PedagogicalRetrievalAgent
-from improvement_agent import AssessmentImprovementAgent
-from justification_agent import JustificationAgent
-from question_classifier import classify_question
 
 
 # ──────────────────────────────────────────────
@@ -456,6 +448,14 @@ from question_classifier import classify_question
 # ──────────────────────────────────────────────
 
 def main():
+    # Import agents here (not at module level) so the module can be
+    # imported by the FastAPI server without these dependencies.
+    from assessment_agent import AssessmentAnalysisAgent
+    from pedagogical_agent import PedagogicalRetrievalAgent
+    from improvement_agent import AssessmentImprovementAgent
+    from justification_agent import JustificationAgent
+    from question_classifier import classify_question
+
     print("=" * 60)
     print("  Exam Question Difficulty Predictor")
     print("  Dataset: SciQ (13,679 science exam questions)")

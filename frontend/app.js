@@ -3,7 +3,7 @@
  * Frontend Logic — Milestone 1 (Classical ML)
  */
 
-const API_BASE_URL = "https://genai-ztl4.onrender.com";
+const API_BASE_URL = "/api";
 
 // State
 const state = {
