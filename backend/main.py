@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import pandas as pd
 import numpy as np
 import os
@@ -10,8 +11,6 @@ try:
     from .exam_difficulty_predictor import predict_difficulty
 except ImportError:
     from exam_difficulty_predictor import predict_difficulty
-
-from sklearn.preprocessing import LabelEncoder
 
 from sklearn.preprocessing import LabelEncoder
 

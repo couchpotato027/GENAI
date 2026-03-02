@@ -1,7 +1,7 @@
 /**
  * ═══════════════════════════════════════════════════════
- * Intelligent Exam Question Analysis & Agentic Assessment
- * Frontend Logic — Milestone 2 (Real Backend API)
+ * Intelligent Exam Question Analysis
+ * Frontend Logic — Milestone 1 (Classical ML)
  * ═══════════════════════════════════════════════════════
  */
 
@@ -47,15 +47,6 @@ const dom = {
     evalAccuracy: document.getElementById("evalAccuracy"),
     evalPrecision: document.getElementById("evalPrecision"),
     evalRecall: document.getElementById("evalRecall"),
-
-    // Tooltip
-    tooltipTrigger: document.getElementById("tooltipTrigger"),
-    tooltipContent: document.getElementById("tooltipContent"),
-
-    // Progress
-    progressContainer: document.getElementById("progressContainer"),
-    progressFill: document.getElementById("progressFill"),
-    progressLabel: document.getElementById("progressLabel"),
 };
 
 
@@ -187,14 +178,6 @@ function isBinary(scores) {
 const PASS_THRESHOLD = 50;
 
 /**
- * Compute ML metrics strictly from real student scores.
- * No LLMs, no heuristics, no defaults.
- *
- * Detects binary vs continuous data:
- *   Binary  (0/1)  → "Percentage Correct" = count(1s) / total × 100
- *   Continuous      → "Pass Rate (≥50%)"  = count(scores ≥ threshold) / total × 100
- */
-/**
  * Run Analysis via Backend API
  */
 async function runAnalysis(questionText, scoresStr) {
@@ -218,7 +201,7 @@ async function runAnalysis(questionText, scoresStr) {
             confidence: res.confidence,
             avgScore: res.avg_score.toFixed(1),
             rateValue: res.pass_rate.toFixed(1),
-            metricLabel: "Pass Rate (≥50%)", // Simplified for Milestone 2
+            metricLabel: "Pass Rate (≥50%)",
             variance: res.variance.toFixed(1),
             discIndex: res.disc_index
         };
@@ -295,9 +278,6 @@ dom.btnRunAnalysis.addEventListener("click", async () => {
     // Determine which source to use (manual takes priority over CSV for now)
     const scoresStr = dom.manualScores.value.trim();
 
-    // Guard 3: parse and validate — stop execution on any error
-    // (We also let the API handle validation, but simple check here helps)
-
     // UI Loading State
     const originalText = dom.btnRunAnalysis.textContent;
     dom.btnRunAnalysis.textContent = "Analyzing...";
@@ -319,7 +299,7 @@ dom.btnRunAnalysis.addEventListener("click", async () => {
         dom.confidenceFill.style.width = (data.confidence * 100) + "%";
         dom.resAvgScore.textContent = data.avgScore;
 
-        // Dynamic label: "Percentage Correct" for binary, "Pass Rate (≥50%)"
+        // Dynamic label
         document.getElementById("resPctLabel").textContent = data.metricLabel;
         dom.resPctCorrect.textContent = data.rateValue + "%";
         dom.resVariance.textContent = data.variance;
@@ -344,18 +324,4 @@ dom.evalToggle.addEventListener("click", () => {
     const isOpen = dom.evalContent.style.display !== "none";
     dom.evalContent.style.display = isOpen ? "none" : "block";
     dom.expandIcon.classList.toggle("open", !isOpen);
-});
-
-
-// ═══════════════════════════════════════════════
-// TOOLTIP
-// ═══════════════════════════════════════════════
-dom.tooltipTrigger.addEventListener("click", () => {
-    dom.tooltipContent.classList.toggle("visible");
-});
-
-document.addEventListener("click", (e) => {
-    if (!dom.tooltipTrigger.contains(e.target) && !dom.tooltipContent.contains(e.target)) {
-        dom.tooltipContent.classList.remove("visible");
-    }
 });
