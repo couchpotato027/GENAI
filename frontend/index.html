@@ -16,29 +16,11 @@
 
 <body>
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- TOP NAVIGATION BAR                         -->
-    <!-- ═══════════════════════════════════════════ -->
-    <nav class="top-nav" id="topNav">
-        <div class="nav-left">
-            <h1 class="app-title">
-                <span class="logo-box">🧠</span>
-                Intelligent Exam Analysis
-            </h1>
-            <span class="app-subtitle">& Agentic Assessment Designer</span>
-        </div>
-        <div class="nav-right">
-            <div class="mode-toggle" id="modeToggle">
-                <button class="mode-btn active" id="btnAnalytics" data-mode="analytics">
-                    <span class="mode-icon">🟢</span>
-                    Analytics Mode
-                    <span class="mode-label">Milestone 1</span>
-                </button>
-                <button class="mode-btn ml2-agentic-btn" id="btnAgentic" data-mode="agentic">
-                    <span class="mode-icon">🌌</span>
-                    Agentic AI Mode
-                    <span class="mode-label" style="color: #fff; opacity: 0.8;">Milestone 2</span>
-                </button>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="brand">
+                <h1>Educator AI</h1>
+                <span class="badge">Milestone 1</span>
             </div>
         </div>
     </nav>
@@ -190,164 +172,10 @@
             </section>
         </div>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- 🔵 AGENTIC DESIGN MODE (MILESTONE 2)       -->
-        <!-- ═══════════════════════════════════════════ -->
-        <div class="mode-panel" id="agenticPanel" style="display:none;">
+        </div>
+        </div>
 
-            <!-- Section 1: Context Overview -->
-            <section class="section context-section">
-                <div class="section-header">
-                    <h2>Context Overview</h2>
-                    <p class="section-desc">Summary from Milestone 1 analysis — the starting point for agentic
-                        reasoning.</p>
-                </div>
-                <div class="context-grid">
-                    <div class="context-card">
-                        <span class="context-label">Original Question</span>
-                        <p class="context-value question-text" id="ctxQuestion">No analysis run yet. Please run ML
-                            Analysis in Analytics Mode first.</p>
-                    </div>
-                    <div class="context-metrics">
-                        <div class="context-metric">
-                            <span class="metric-label">Predicted Difficulty</span>
-                            <span class="metric-value" id="ctxDifficulty">—</span>
-                        </div>
-                        <div class="context-metric">
-                            <span class="metric-label">Avg Score</span>
-                            <span class="metric-value" id="ctxAvgScore">—</span>
-                        </div>
-                        <div class="context-metric">
-                            <span class="metric-label" id="ctxPctLabel">% Correct</span>
-                            <span class="metric-value" id="ctxPctCorrect">—</span>
-                        </div>
-                        <div class="context-metric">
-                            <span class="metric-label">Variance</span>
-                            <span class="metric-value" id="ctxVariance">—</span>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn-primary btn-agentic" id="btnStartAgents" disabled>
-                    <span class="btn-icon">🧠</span>
-                    Start Agentic Assessment
-                </button>
-                <div class="tooltip-container">
-                    <span class="tooltip-trigger" id="tooltipTrigger">ℹ️ What is Agentic AI?</span>
-                    <div class="tooltip-content" id="tooltipContent">
-                        Agentic AI refers to AI systems composed of multiple specialized agents that reason sequentially
-                        — each agent performs a distinct cognitive task (analysis, retrieval, improvement,
-                        justification) and passes its output to the next, mimicking expert human reasoning workflows.
-                    </div>
-                </div>
-            </section>
-
-            <!-- Progress Indicator -->
-            <div class="progress-bar-container" id="progressContainer" style="display:none;">
-                <div class="progress-track">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <span class="progress-label" id="progressLabel">Initializing agents…</span>
-            </div>
-
-            <!-- Section 2: Agent Reasoning Timeline -->
-            <section class="section timeline-section" id="timelineSection" style="display:none;">
-                <div class="section-header">
-                    <h2>Agent Reasoning Timeline</h2>
-                    <p class="section-desc">Each agent performs a distinct reasoning step. Outputs appear sequentially.
-                    </p>
-                </div>
-
-                <!-- Agent 1: Assessment Analysis -->
-                <div class="agent-card" id="agent1Card" style="display:none;">
-                    <div class="agent-header" id="agent1Toggle">
-                        <div class="agent-title">
-                            <span class="agent-icon">🧠</span>
-                            <span>Agent 1 — Assessment Analysis</span>
-                        </div>
-                        <span class="agent-expand">▼</span>
-                    </div>
-                    <div class="agent-body" id="agent1Body">
-                        <div class="agent-field">
-                            <span class="field-label">Assessment Quality</span>
-                            <span class="field-value quality-badge" id="agentQuality">—</span>
-                        </div>
-                        <div class="agent-field">
-                            <span class="field-label">Identified Issues</span>
-                            <ul class="issue-list" id="agentIssues">
-                                <li>—</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Agent 2: Pedagogical Retrieval -->
-                <div class="agent-card" id="agent2Card" style="display:none;">
-                    <div class="agent-header" id="agent2Toggle">
-                        <div class="agent-title">
-                            <span class="agent-icon">📚</span>
-                            <span>Agent 2 — Pedagogical Retrieval</span>
-                        </div>
-                        <span class="agent-expand">▼</span>
-                    </div>
-                    <div class="agent-body" id="agent2Body">
-                        <div class="agent-field">
-                            <span class="field-label">Retrieved Principles</span>
-                            <ul class="principle-list" id="agentPrinciples">
-                                <li>—</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Agent 3: Question Improvement -->
-                <div class="agent-card" id="agent3Card" style="display:none;">
-                    <div class="agent-header" id="agent3Toggle">
-                        <div class="agent-title">
-                            <span class="agent-icon">✏️</span>
-                            <span>Agent 3 — Question Improvement</span>
-                        </div>
-                        <span class="agent-expand">▼</span>
-                    </div>
-                    <div class="agent-body" id="agent3Body">
-                        <div class="agent-field">
-                            <span class="field-label">Suggested Improvements</span>
-                            <ol class="improvement-list" id="agentImprovements">
-                                <li>—</li>
-                            </ol>
-                        </div>
-                        <div class="agent-field rewritten-question-field">
-                            <span class="field-label">Rewritten Question</span>
-                            <blockquote class="rewritten-question" id="agentRewritten">—</blockquote>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Agent 4: Justification -->
-                <div class="agent-card" id="agent4Card" style="display:none;">
-                    <div class="agent-header" id="agent4Toggle">
-                        <div class="agent-title">
-                            <span class="agent-icon">🧾</span>
-                            <span>Agent 4 — Justification</span>
-                        </div>
-                        <span class="agent-expand">▼</span>
-                    </div>
-                    <div class="agent-body" id="agent4Body">
-                        <div class="agent-field">
-                            <span class="field-label">How discrimination is improved</span>
-                            <p class="justification-text" id="justDisc">—</p>
-                        </div>
-                        <div class="agent-field">
-                            <span class="field-label">How difficulty is better calibrated</span>
-                            <p class="justification-text" id="justDiff">—</p>
-                        </div>
-                        <div class="agent-field">
-                            <span class="field-label">How learning outcomes are clearer</span>
-                            <p class="justification-text" id="justLO">—</p>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
+        </section>
         </div>
 
     </main>

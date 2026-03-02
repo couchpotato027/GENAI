@@ -9,20 +9,14 @@ const API_BASE_URL = "https://genai-ztl4.onrender.com";
 
 // ─── State ───
 const state = {
-    currentMode: "analytics",  // "analytics" | "agentic"
     analysisComplete: false,
     analysisData: null,
 };
 
 // ─── DOM References ───
 const dom = {
-    // Nav
-    btnAnalytics: document.getElementById("btnAnalytics"),
-    btnAgentic: document.getElementById("btnAgentic"),
-
     // Panels
     analyticsPanel: document.getElementById("analyticsPanel"),
-    agenticPanel: document.getElementById("agenticPanel"),
 
     // Input
     questionText: document.getElementById("questionText"),
@@ -54,14 +48,6 @@ const dom = {
     evalPrecision: document.getElementById("evalPrecision"),
     evalRecall: document.getElementById("evalRecall"),
 
-    // Agentic - Context
-    ctxQuestion: document.getElementById("ctxQuestion"),
-    ctxDifficulty: document.getElementById("ctxDifficulty"),
-    ctxAvgScore: document.getElementById("ctxAvgScore"),
-    ctxPctCorrect: document.getElementById("ctxPctCorrect"),
-    ctxVariance: document.getElementById("ctxVariance"),
-    btnStartAgents: document.getElementById("btnStartAgents"),
-
     // Tooltip
     tooltipTrigger: document.getElementById("tooltipTrigger"),
     tooltipContent: document.getElementById("tooltipContent"),
@@ -70,31 +56,7 @@ const dom = {
     progressContainer: document.getElementById("progressContainer"),
     progressFill: document.getElementById("progressFill"),
     progressLabel: document.getElementById("progressLabel"),
-
-    // Timeline
-    timelineSection: document.getElementById("timelineSection"),
-    agent1Card: document.getElementById("agent1Card"),
-    agent2Card: document.getElementById("agent2Card"),
-    agent3Card: document.getElementById("agent3Card"),
-    agent4Card: document.getElementById("agent4Card"),
 };
-
-
-// ═══════════════════════════════════════════════
-// MODE TOGGLE
-// ═══════════════════════════════════════════════
-function switchMode(mode) {
-    state.currentMode = mode;
-
-    dom.btnAnalytics.classList.toggle("active", mode === "analytics");
-    dom.btnAgentic.classList.toggle("active", mode === "agentic");
-
-    dom.analyticsPanel.style.display = mode === "analytics" ? "block" : "none";
-    dom.agenticPanel.style.display = mode === "agentic" ? "block" : "none";
-}
-
-dom.btnAnalytics.addEventListener("click", () => switchMode("analytics"));
-dom.btnAgentic.addEventListener("click", () => switchMode("agentic"));
 
 
 // ═══════════════════════════════════════════════
@@ -357,7 +319,7 @@ dom.btnRunAnalysis.addEventListener("click", async () => {
         dom.confidenceFill.style.width = (data.confidence * 100) + "%";
         dom.resAvgScore.textContent = data.avgScore;
 
-        // Dynamic label: "Percentage Correct" for binary, "Pass Rate (≥50%)" for continuous
+        // Dynamic label: "Percentage Correct" for binary, "Pass Rate (≥50%)"
         document.getElementById("resPctLabel").textContent = data.metricLabel;
         dom.resPctCorrect.textContent = data.rateValue + "%";
         dom.resVariance.textContent = data.variance;
@@ -366,11 +328,8 @@ dom.btnRunAnalysis.addEventListener("click", async () => {
         dom.resultsSection.style.display = "block";
         dom.evalSection.style.display = "block";
 
-        // Sync to Agentic mode context
-        syncAgenticContext(data);
-
     } catch (err) {
-        setWarning(err.message);
+        setWarning(`Runtime Error: ${err.message}`);
     } finally {
         dom.btnRunAnalysis.textContent = originalText;
         dom.btnRunAnalysis.disabled = false;
@@ -389,24 +348,6 @@ dom.evalToggle.addEventListener("click", () => {
 
 
 // ═══════════════════════════════════════════════
-// AGENTIC MODE — Context Sync
-// ═══════════════════════════════════════════════
-function syncAgenticContext(data) {
-    dom.ctxQuestion.textContent = data.question;
-    dom.ctxDifficulty.textContent = data.difficulty;
-    dom.ctxAvgScore.textContent = data.avgScore;
-
-    // Update agentic label to match Analytics mode
-    document.getElementById("ctxPctLabel").textContent =
-        data.metricLabel === "Percentage Correct" ? "% Correct" : "Pass Rate";
-    dom.ctxPctCorrect.textContent = data.rateValue + "%";
-
-    dom.ctxVariance.textContent = data.variance;
-    dom.btnStartAgents.disabled = false;
-}
-
-
-// ═══════════════════════════════════════════════
 // TOOLTIP
 // ═══════════════════════════════════════════════
 dom.tooltipTrigger.addEventListener("click", () => {
@@ -417,183 +358,4 @@ document.addEventListener("click", (e) => {
     if (!dom.tooltipTrigger.contains(e.target) && !dom.tooltipContent.contains(e.target)) {
         dom.tooltipContent.classList.remove("visible");
     }
-});
-
-
-// ═══════════════════════════════════════════════
-// AGENTIC MODE — Agent Execution (Sequential)
-// ═══════════════════════════════════════════════
-
-/**
- * Tiered Quality Labels
- * =====================
- * Mirrors question_classifier.py — keep thresholds in sync.
- *
- * Categories:
- *   "easy"       → "Suitable for Recall Assessment"
- *   "hard_valid" → "Good Discriminator"
- *   "poor"       → "Poor Discriminator (Ambiguous Design)"
- */
-
-const QUALITY_LABELS = {
-    easy: "Suitable for Recall Assessment",
-    hard_valid: "Good Discriminator",
-    poor: "Poor Discriminator (Ambiguous Design)",
-};
-
-function classifyQuestion(avgScore, passRate, variance) {
-    if (avgScore >= 70 && passRate >= 80) return "easy";
-    if (avgScore < 45 && passRate < 50 && variance > 100) return "hard_valid";
-    return "poor";
-}
-
-async function generateAgentOutputs(data) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/analyze`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                question: data.question,
-                avg_score: parseFloat(data.avgScore),
-                variance: parseFloat(data.variance),
-                pass_rate: parseFloat(data.rateValue),
-                predicted_difficulty: data.difficulty,
-                disc_index: data.discIndex
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Agent API Error: ${response.statusText}`);
-        }
-
-        const outputs = await response.json();
-        return outputs; // Structure matches what app.js expects: { agent1: {...}, agent2: {...} }
-    } catch (err) {
-        console.error(err);
-        alert("Failed to run agents: " + err.message);
-        throw err;
-    }
-}
-
-
-dom.btnStartAgents.addEventListener("click", async () => {
-    if (!state.analysisComplete || !state.analysisData) {
-        alert("Please run ML Analysis first in Analytics Mode.");
-        return;
-    }
-
-    // UI Feedback
-    dom.btnStartAgents.disabled = true;
-    dom.btnStartAgents.textContent = "Agent Pipeline Running...";
-
-    try {
-        const outputs = await generateAgentOutputs(state.analysisData);
-
-        // Reset all agents
-        dom.agent1Card.style.display = "none";
-        dom.agent2Card.style.display = "none";
-        dom.agent3Card.style.display = "none";
-        dom.agent4Card.style.display = "none";
-        dom.timelineSection.style.display = "block";
-        dom.progressContainer.style.display = "block";
-        dom.btnStartAgents.disabled = true;
-
-        const agentSteps = [
-            {
-                label: "Running Agent 1 — Assessment Analysis…",
-                progress: 25,
-                action: () => {
-                    const q = dom.getElementById ? null : null;
-                    // Agent 1
-                    const qualityEl = document.getElementById("agentQuality");
-                    qualityEl.textContent = outputs.agent1.quality;
-                    // Map tiered label to CSS class: easy→recall, hard_valid→good, poor→poor
-                    const qualityCss = case_ => ({ easy: "recall", hard_valid: "good", poor: "poor" }[case_] || "poor");
-                    const currentCase = classifyQuestion(
-                        parseFloat(state.analysisData.avgScore),
-                        parseFloat(state.analysisData.rateValue),
-                        parseFloat(state.analysisData.variance)
-                    );
-                    qualityEl.className = "field-value quality-badge " + qualityCss(currentCase);
-
-                    const issuesList = document.getElementById("agentIssues");
-                    issuesList.innerHTML = outputs.agent1.issues.map(i => `<li>${i}</li>`).join("");
-
-                    dom.agent1Card.style.display = "block";
-                },
-            },
-            {
-                label: "Running Agent 2 — Pedagogical Retrieval…",
-                progress: 50,
-                action: () => {
-                    const principleList = document.getElementById("agentPrinciples");
-                    principleList.innerHTML = outputs.agent2.principles.map(p => `<li><strong>${p.split(":")[0]}:</strong> ${p.split(":").slice(1).join(":").trim()}</li>`).join("");
-
-                    dom.agent2Card.style.display = "block";
-                },
-            },
-            {
-                label: "Running Agent 3 — Question Improvement…",
-                progress: 75,
-                action: () => {
-                    const improvList = document.getElementById("agentImprovements");
-                    improvList.innerHTML = outputs.agent3.improvements.map(imp => `<li>${imp}</li>`).join("");
-
-                    document.getElementById("agentRewritten").textContent = outputs.agent3.rewritten;
-
-                    dom.agent3Card.style.display = "block";
-                },
-            },
-            {
-                label: "Running Agent 4 — Justification…",
-                progress: 100,
-                action: () => {
-                    document.getElementById("justDisc").textContent = outputs.agent4.justDisc;
-                    document.getElementById("justDiff").textContent = outputs.agent4.justDiff;
-                    document.getElementById("justLO").textContent = outputs.agent4.justLO;
-
-                    dom.agent4Card.style.display = "block";
-                },
-            },
-        ];
-
-        // Run agents sequentially with delays
-        let delay = 0;
-        agentSteps.forEach((step, idx) => {
-            delay += 800; // 800ms per agent
-            setTimeout(() => {
-                dom.progressFill.style.width = step.progress + "%";
-                dom.progressLabel.textContent = step.label;
-                step.action();
-
-                // Final step
-                if (idx === agentSteps.length - 1) {
-                    setTimeout(() => {
-                        dom.progressLabel.textContent = "✅ All agents complete.";
-                        dom.btnStartAgents.disabled = false;
-                    }, 400);
-                }
-            }, delay);
-        });
-    } catch (err) {
-        console.error(err);
-        dom.btnStartAgents.disabled = false;
-        dom.btnStartAgents.textContent = "Start Agentic Pipeline";
-        alert("Pipeline failed: " + err.message);
-    }
-});
-
-
-// ═══════════════════════════════════════════════
-// AGENT CARD EXPAND/COLLAPSE
-// ═══════════════════════════════════════════════
-["agent1", "agent2", "agent3", "agent4"].forEach(id => {
-    const toggle = document.getElementById(`${id}Toggle`);
-    const body = document.getElementById(`${id}Body`);
-
-    toggle.addEventListener("click", () => {
-        const isCollapsed = body.classList.contains("collapsed");
-        body.classList.toggle("collapsed", !isCollapsed);
-        toggle.querySelector(".agent-expand").classList.toggle("open", isCollapsed);
-    });
 });
