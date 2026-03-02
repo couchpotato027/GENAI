@@ -35,6 +35,10 @@
                     <span class="mode-label">Milestone 1</span>
                 </button>
             </div>
+            <button class="mode-btn about-btn" id="btnAboutUs">
+                <span class="mode-icon">👥</span>
+                About Us
+            </button>
         </div>
     </nav>
 
@@ -192,6 +196,31 @@
         <p>This system uses classical ML-based educational analytics for exam question difficulty prediction.</p>
         <p>Built using Scikit-learn, TF-IDF, and Logistic Regression.</p>
     </footer>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ABOUT US MODAL                             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="modal-overlay" id="aboutModal" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>About Us</h2>
+                <button class="modal-close" id="closeAbout">✕</button>
+            </div>
+            <p class="modal-desc">The team behind Intelligent Exam Question Analysis</p>
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="photos/priyansh.jpeg" alt="Priyansh Satija" class="team-photo">
+                    <h3>Priyansh Satija</h3>
+                    <p class="team-role">ML Engineer & Backend Developer</p>
+                </div>
+                <div class="team-member">
+                    <div class="team-photo placeholder-photo">BG</div>
+                    <h3>Bhavay Goyal</h3>
+                    <p class="team-role">Frontend Developer & UI Designer</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>

@@ -58,6 +58,27 @@ dom.browseLink.addEventListener("click", (e) => {
     dom.csvUpload.click();
 });
 
+// ═══════════════════════════════════════════════
+// ABOUT US MODAL
+// ═══════════════════════════════════════════════
+const aboutModal = document.getElementById("aboutModal");
+const btnAboutUs = document.getElementById("btnAboutUs");
+const closeAbout = document.getElementById("closeAbout");
+
+btnAboutUs.addEventListener("click", () => {
+    aboutModal.style.display = "flex";
+});
+
+closeAbout.addEventListener("click", () => {
+    aboutModal.style.display = "none";
+});
+
+aboutModal.addEventListener("click", (e) => {
+    if (e.target === aboutModal) {
+        aboutModal.style.display = "none";
+    }
+});
+
 dom.fileUploadArea.addEventListener("click", () => {
     if (dom.uploadSuccess.style.display === "none") {
         dom.csvUpload.click();
