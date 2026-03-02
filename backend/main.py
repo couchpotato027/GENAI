@@ -47,9 +47,12 @@ async def startup_event():
         TFIDF = joblib.load(os.path.join(model_dir, "tfidf.joblib"))
         SCALER = joblib.load(os.path.join(model_dir, "scaler.joblib"))
         LE = joblib.load(os.path.join(model_dir, "label_encoder.joblib"))
-        print("Models loaded successfully.")
+        print(f"Models loaded successfully from {model_dir}")
+        print(f"  Model keys: {list(MODELS.keys())}")
     except Exception as e:
-        print(f"Error loading models: {e}")
+        import traceback
+        print(f"[CRITICAL] Error loading models from {model_dir}:")
+        traceback.print_exc()
         print("Please run backend/train_and_save.py first.")
 
 
@@ -63,28 +66,34 @@ def read_root():
 @app.post("/predict")
 def predict(req: MatchRequest):
     if not MODELS:
-        raise HTTPException(status_code=503, detail="Models not loaded")
+        raise HTTPException(status_code=503, detail="Models not loaded. Check server startup logs.")
+    
+    try:
+        model = MODELS["Logistic Regression"]
         
-    model = MODELS["Logistic Regression"]
-    
-    label, confidence, avg, var, pr = predict_difficulty(
-        req.question,
-        req.student_scores,
-        model,
-        TFIDF,
-        SCALER,
-        LE
-    )
-    
-    # Calculate Disc Index here for frontend consistency
-    disc_index = round(min(var / 500, 1.0), 2)
-    
-    return {
-        "predicted_difficulty": label,
-        "confidence": confidence,
-        "avg_score": avg,
-        "variance": var,
-        "pass_rate": pr,
-        "disc_index": disc_index
-    }
+        label, confidence, avg, var, pr = predict_difficulty(
+            req.question,
+            req.student_scores,
+            model,
+            TFIDF,
+            SCALER,
+            LE
+        )
+        
+        # Calculate Disc Index here for frontend consistency
+        disc_index = round(min(var / 500, 1.0), 2)
+        
+        return {
+            "predicted_difficulty": label,
+            "confidence": confidence,
+            "avg_score": avg,
+            "variance": var,
+            "pass_rate": pr,
+            "disc_index": disc_index
+        }
+    except Exception as e:
+        import traceback
+        error_detail = traceback.format_exc()
+        print(f"[ERROR] /predict failed:\n{error_detail}")
+        raise HTTPException(status_code=500, detail=str(e))
 
