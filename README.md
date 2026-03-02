@@ -1,62 +1,116 @@
-# Project: Intelligent Exam Question Analysis & Agentic Pedagogical Strategy
+# Intelligent Exam Question Difficulty Predictor
 
-## From Predictive Analytics to Intelligent Intervention
+## Project Description
 
-### Project Overview
-This project involves the design and implementation of an **AI-driven educational analytics system** that predicts exam question difficulty and evolves into an agentic AI pedagogical assistant.
+This system predicts the difficulty level (Easy, Medium, or Hard) of exam questions using classical machine learning. It combines natural language processing of question text with student performance statistics to produce a difficulty classification along with model confidence scores.
 
-- **Milestone 1:** Classical machine learning techniques applied to exam question text and simulated student performance behavior data to predict question difficulty (Easy / Medium / Hard) and identify key performance drivers.
-- **Milestone 2:** Extension into an agent-based AI application that autonomously reasons about difficulty factors, retrieves educational best practices (RAG), and plans improvement strategies for educators.
+The project was built as part of an academic AI/ML course and currently implements Milestone 1 — a complete ML-based prediction pipeline with a deployed web interface. Milestone 2 will extend the system into an agentic pedagogical assistant.
 
 ---
 
-### Constraints & Requirements
-- **Team Size:** 3–4 Students
-- **API Budget:** Free Tier Only (Open-source models / Free APIs)
-- **Framework:** LangGraph (Recommended)
-- **Hosting:** Mandatory (Hugging Face Spaces, Streamlit Cloud, or Render)
+## How the System Works
+
+```
+User enters a question + student scores in the web UI
+        │
+        ▼
+Frontend sends POST /predict to the FastAPI backend
+        │
+        ▼
+Backend vectorizes the question text (TF-IDF) and
+scales the numeric features (avg score, variance, pass rate)
+        │
+        ▼
+Combined feature vector is fed to a trained Logistic Regression model
+        │
+        ▼
+Returns: predicted difficulty, confidence %, and score summary
+        │
+        ▼
+Frontend renders the result alongside offline evaluation metrics
+```
+
+### ML Pipeline Overview
+
+1. **Text Preprocessing** — Question text is cleaned and tokenized.
+2. **TF-IDF Vectorization** — Text is converted into a 5,000-dimensional feature vector.
+3. **Numeric Feature Engineering** — Three student performance statistics are computed: average score, score variance, and pass rate.
+4. **Feature Concatenation** — The final feature vector is:
+   ```
+   [ TF-IDF text features (5000) | avg_score | variance | pass_rate ]
+   ```
+5. **Standard Scaling** — Numeric features are scaled for model compatibility.
+6. **Classification** — A Logistic Regression model predicts difficulty as Easy, Medium, or Hard.
 
 ---
 
-### Technology Stack
-| Component | Technology |
-| :--- | :--- |
-| **ML Models (M1)** | Logistic Regression, Decision Trees, Scikit-Learn |
-| **Agent Framework (M2)** | LangGraph, Chroma/FAISS (RAG) |
-| **UI Framework** | Streamlit or Gradio |
-| **LLMs (M2)** | Open-source models or Free-tier APIs |
+## Dataset
+
+The system uses the **SciQ dataset**, which contains approximately **13,679 science multiple-choice questions** with answer options and supporting explanations.
+
+Since the SciQ dataset does not include real student responses, **student performance scores (average score, variance, pass rate) are simulated transparently during training**. The simulation assigns score distributions based on difficulty labels derived from question characteristics.
+
+During live usage, the system accepts **real user-entered scores**, making predictions based on actual performance data provided at inference time.
 
 ---
 
-### Milestones & Deliverables
+## Machine Learning Approach
 
-#### Milestone 1: ML-Based Difficulty Prediction (Mid-Sem)
-**Objective:** Identify exam question difficulty using text features along with historical student behavioral data, focusing strictly on classical ML pipelines *without LLMs*.
+Two classifiers were trained and evaluated during development:
 
-**Key Deliverables:**
-- Problem understanding & Business context.
-- System architecture diagram.
-- Working local application with UI (Streamlit/Gradio).
-- Model performance evaluation report (Accuracy, Precision, Recall, Confusion Matrix).
+| Model               | Role                              |
+| :------------------ | :-------------------------------- |
+| Logistic Regression | Primary model used in production  |
+| Decision Tree       | Trained for comparison during evaluation |
 
-#### Milestone 2: Agentic Pedagogical Assistant (End-Sem)
-**Objective:** Extend the system into an agentic strategist that reasons about linguistic complexity and performance variance, retrieving best pedagogical practices to generate structured recommendations.
+Both models were trained on the combined TF-IDF + numeric feature vector using the scikit-learn library. The Logistic Regression model was selected for deployment based on evaluation performance.
 
-**Key Deliverables:**
-- **Publicly deployed application** (Link required).
-- Agent workflow documentation (States & Nodes).
-- Structured pedagogical report generation.
-- GitHub Repository & Complete Codebase.
-- Demo Video (Max 5 mins).
+### A Note on Feature Dominance
+
+The model may produce the same difficulty prediction for an empty question with specific scores as it does for a full question with the same scores. This occurs because **student performance features (avg_score, variance, pass_rate) tend to dominate** the prediction over text features alone. This is expected behavior in educational analytics, where empirical student outcomes are strong indicators of question difficulty regardless of question wording.
 
 ---
 
-### Evaluation Criteria
+## Evaluation Metrics
 
-| Phase | Weight | Criteria |
-| :--- | :--- | :--- |
-| **Mid-Sem** | 25% | ML technique application, Feature Engineering (TF-IDF & scaling), UI Usability, Evaluation Metrics. |
-| **End-Sem** | 30% | Reasoning quality, RAG & State management implementation, Output clarity, Deployment success. |
+The model is evaluated offline using standard classification metrics:
 
-> [!WARNING]
-> Localhost-only demonstrations will **not** be accepted for final submission. Project must be hosted.
+- **Accuracy** — Overall proportion of correct predictions
+- **Precision** — Per-class correctness of positive predictions
+- **Recall** — Per-class coverage of actual positives
+- **Confusion Matrix** — Detailed breakdown of predictions vs. actual labels
+
+These metrics are displayed in the frontend's Model Evaluation section so users can assess model reliability.
+
+---
+
+## Technology Stack
+
+| Component            | Technology                          |
+| :------------------- | :---------------------------------- |
+| Language             | Python                              |
+| ML Library           | Scikit-learn                        |
+| Data Processing      | Pandas, NumPy                       |
+| Text Vectorization   | TF-IDF (via Scikit-learn)           |
+| Backend API          | FastAPI + Uvicorn                   |
+| Frontend             | HTML, CSS, JavaScript               |
+| Model Persistence    | Joblib                              |
+| Backend Deployment   | Render (free tier)                  |
+| Frontend Deployment  | Vercel                              |
+
+---
+
+## Limitations
+
+- Student scores used during training are simulated, not collected from real exam administrations.
+- The TF-IDF approach treats questions as bags of words and does not capture semantic meaning or question structure.
+- Student performance features dominate predictions, which means text-only predictions (without scores) are less reliable.
+- The model is trained exclusively on science MCQs and may not generalize well to other subjects or question formats.
+
+---
+
+## Future Improvements
+
+- **Milestone 2** will extend this system into an agentic pedagogical assistant that reasons about difficulty factors, retrieves best practices using RAG, and generates structured recommendations for educators.
+- Incorporating real student response data would improve model accuracy.
+- Replacing TF-IDF with contextual embeddings (e.g., sentence transformers) could improve text feature quality.
