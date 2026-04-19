@@ -1,0 +1,159 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{parskip}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{float}
+
+% Colors
+\definecolor{darkblue}{RGB}{0, 51, 102}
+\definecolor{lightgray}{RGB}{245, 245, 245}
+
+% Hyperlink setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=darkblue,
+    urlcolor=darkblue,
+    citecolor=darkblue
+}
+
+% Section formatting
+\titleformat{\section}
+  {\large\bfseries\color{darkblue}}
+  {\thesection.}{0.5em}{}[\titlerule]
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{darkblue}}
+  {\thesubsection}{0.5em}{}
+
+% Header/Footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{gray}{\small Intelligent Exam Predictor}}
+\lhead{\textcolor{gray}{\small Newton School of Technology}}
+\cfoot{\thepage}
+
+\begin{document}
+
+% TITLE PAGE
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    {\Huge\bfseries\color{darkblue} INTELLIGENT EXAM QUESTION ANALYSIS} \\
+    \vspace{0.5cm}
+    {\large\itshape Difficulty Predictor with Agentic AI Assessment Assistant}
+
+    \vspace{2cm}
+    {\LARGE\bfseries GEN-AI CAPSTONE PROJECT REPORT}
+    \vspace{0.5cm}
+    \rule{0.8\textwidth}{0.5pt}
+
+    \vspace{1.5cm}
+    {\large Newton School of Technology\\[0.2em]
+    \textit{May 2026 Academic Submission}}
+
+    \vspace{1.5cm}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Team Members} & \textbf{Roll Numbers} \\
+        \midrule
+        Bhavay Goyal     & [Roll No.] \\
+        Priyansh Satija  & [Roll No.] \\
+        Chirag Lalwani   & [Roll No.] \\
+        \bottomrule
+    \end{tabular}
+
+    \vspace{1.5cm}
+    {\large \textbf{Course:} Generative AI\\[0.4em]
+    \textbf{Instructor:} Kartik Sir}
+    \vfill
+\end{titlepage}
+
+\section{Abstract}
+This report details the development and implementation of an Intelligent Exam Question Difficulty Predictor, enhanced with an Agentic Artificial Intelligence (AI) Assessment Assistant. The overarching objective of this system is to accurately classify the difficulty level of educational questions while simultaneously providing educators with actionable, pedagogically sound insights. By integrating classical machine learning methodologies for robust classification with a modern Agentic Retrieval-Augmented Generation (RAG) framework, the system bridges the gap between empirical difficulty prediction and qualitative instructional refinement. This hybrid architecture ensures that educators not only understand how students are likely to perform on a given question but also receive structured reasoning regarding why a question might be inherently difficult and how its design can be improved.
+
+\section{Introduction}
+In contemporary educational settings, the formulation of fair and appropriately challenging examination questions is a complex undertaking. Traditional predictive models effectively categorize question difficulty based on historical student performance and text structure. However, such models intrinsically lack pedagogical reasoning; they can output a probability or difficulty label but fail to offer insight into the underlying instructional gaps or design flaws of the question itself. 
+
+The motivation for this project stems from the inherent need for pedagogical insights that transcend numerical predictions. Educators require tools that highlight specific learning deficiencies and suggest actionable improvements. By extending a foundational machine learning predictor with an advanced agentic reasoning mechanism, this system seeks to provide a comprehensive assessment tool that empowers educators to design high-quality, cognitively aligned evaluations.
+
+\section{System Overview}
+The integrated pipeline of the proposed system operates in three distinct, sequential phases. Initially, the system accepts user input, which comprises the semantic text of an examination question alongside a corresponding dataset of student scores representing historical performance. 
+
+Following the acquisition of input, the data is channeled into the classical machine learning pipeline. Here, the system extracts linguistic features and calculates statistical performance metrics to generate an empirical prediction of the question's difficulty. Finally, the empirical outputs—such as the predicted difficulty, confidence interval, and performance variance—are fed into an agentic reasoning engine. This engine utilizes the empirical context, retrieves relevant pedagogical principles, and synthesizes a structured, human-readable analysis that interprets the initial prediction and offers qualitative recommendations.
+
+\section{Dataset}
+The foundational text data for this project is derived from the SciQ dataset, which serves as a widely recognized corpus for science-related examination questions. Because real-world student performance data associated explicitly with these questions is generally inaccessible due to privacy constraints, this project utilizes simulated student score distributions. 
+
+The simulated scores are mathematically modeled to reflect varied difficulty scenarios accurately. This simulation approach is carefully justified as it allows the machine learning model to detect distinct statistical patterns, such as the relationship between a low average pass rate and high question difficulty, thereby closely mimicking the performance metrics of a genuine classroom environment.
+
+\section{Methodology}
+
+\subsection{Text Processing}
+The linguistic component of the question data undergoes rigorous cleaning to remove noise, punctuation, and stop words that do not contribute to semantic meaning. Following this normalization, the text is vectorized utilizing the Term Frequency-Inverse Document Frequency (TF-IDF) technique. The vectorizer is constrained to a maximum of 5,000 features to maintain computational efficiency while capturing the most discriminative vocabulary within the questions.
+
+\subsection{Feature Engineering}
+To supplement the linguistic data, critical statistical features are engineered directly from the simulated student scores. The engineered features encapsulate the average score achieved by the students, the variance of the scores, and the overall pass rate. These deterministic metrics provide the numerical grounding necessary for the model to establish empirical correlations between student outcomes and question difficulty.
+
+\subsection{Model}
+The predictive phase of the methodology employs supervised classical machine learning models. A Logistic Regression model functions as the primary classifier, given its interpretability and efficacy in establishing linear decision boundaries across high-dimensional TF-IDF arrays and continuous performance features. For comparative analysis and to capture potential non-linear relationships, a Decision Tree classifier is also implemented and evaluated in tandem.
+
+\subsection{Evaluation Metrics}
+To rigorously assess model performance, a comprehensive suite of evaluation metrics is computed using a held-out validation dataset. These metrics include overall classification accuracy, precision, and recall. Additionally, a confusion matrix is constructed to explicitly map the true positives, false positives, false negatives, and true negatives across the prediction classes (Easy, Medium, and Hard), ensuring transparent visibility into the model's localized biases and error distribution.
+
+\section{Key Observation}
+A profound observation during the evaluation of the machine learning pipeline is the phenomenon of feature dominance. Specifically, the statistical parameters derived from student performance (average score, variance, and pass rate) heavily outweigh the linguistic TF-IDF features in determining the final difficulty prediction. This behavior is highly meaningful from an analytical standpoint; it inherently validates the notion that empirical student outcomes are the strongest indicators of practical question difficulty, overriding the pure semantic complexity of the text string.
+
+\section{Agentic System (Milestone 2)}
+
+\subsection{Architecture}
+The subsequent milestone of the project introduces the Agentic AI Assessment Assistant, structured upon a LangGraph workflow. This agentic framework is characterized by robust state management, wherein contextual data is persistently maintained and transitioned across sequential processing nodes. The architecture ensures that each step of the reasoning pipeline has continuous access to the initial empirical predictions and the retrieved domain knowledge.
+
+\subsection{RAG System}
+To ground the Large Language Model (LLM) in established educational theory, a Retrieval-Augmented Generation (RAG) system is integrated. Leveraging FAISS and Chroma as vector storage solutions, the system indexes and targets a tailored knowledge base of pedagogical literature. This encompasses frameworks such as Bloom's Taxonomy and foundational question design principles, enabling the agent to cross-reference empirical difficulties with standardized academic standards.
+
+\subsection{LLM Integration}
+The reasoning engine is powered by the Qwen 3.5 LLM, accessed efficiently via the Groq inference API. To ensure consistency and academic reliability in the generated recommendations, the model temperature is strictly constrained to a low value. This limits hallucinatory generations and enforces stable, deterministic, and highly focused analytical outputs.
+
+\subsection{Reasoning Flow}
+The workflow of the agent operates methodically: it begins by ingesting the empirical outputs generated by the machine learning model. The agent interprets these metrics, queries the RAG system to retrieve corresponding pedagogical documentation, and synthesizes the final structured recommendations. This flow effectively translates raw numbers into a consultative diagnostic report regarding the text.
+
+\section{System Architecture Diagram}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{architecture.png}
+\caption{System Architecture detailing the integration of the ML predictive pipeline and the Agentic RAG reasoning engine.}
+\end{figure}
+
+\section{Results and Output}
+The holistic output of the system seamlessly combines empirical data with qualitative guidance. The interface initially presents the numerical difficulty prediction, confidence scores, and raw student metrics. This is immediately followed by the structured output of the agentic assistant, which furnishes an executive summary of the question's efficacy, explicit identification of learning gaps or cognitive disconnects, and a bulleted sequence of actionable recommendations intended to optimize the question's clarity and pedagogical value.
+
+\section{Limitations}
+While robust, the current iteration of the system acknowledges several limitations. Primarily, the reliance on simulated student data restricts the model's exposure to the nuanced, unpredictable variance found in authentic educational environments. Furthermore, TF-IDF vectorization, while effective, lacks the dense semantic context provided by modern neural embeddings. Finally, the observed feature dominance of student statistics occasionally overshadows legitimate textual ambiguities that independent text analysis might otherwise flag.
+
+\section{Future Work}
+Future enhancements to this system will pivot toward replacing simulated scores with real, ethically sourced student performance data. Additionally, upgrading the text processing pipeline to utilize dense vector embeddings—such as those produced by transformer models—will dramatically improve semantic understanding. Further refinements to the agent's reasoning logic will also be pursued to enable multi-turn dialogue, allowing educators to actively iterate on question design alongside the AI.
+
+\section{Conclusion}
+This project successfully demonstrates the powerful synthesis of classical machine learning algorithms and advanced agentic AI architectures within the educational domain. By deliberately separating the empirical difficulty prediction from the pedagogical reasoning, the system maintains high statistical rigor while delivering deeply insightful qualitative feedback. This dual-pipeline approach ensures that assessment tools evolve from mere predictive black-boxes into collaborative, transparent, and instructional assessment assistants.
+
+\section{Ethical Considerations}
+The deployment of artificial intelligence in educational evaluation necessitates careful ethical oversight. This system is fundamentally designed to act as an assistive tool rather than a sovereign decision-maker. It is imperative that educators avoid over-reliance on the automated outputs. Final curricular decisions, grading structures, and assessment designs must remain in the purview of human educators to guarantee academic integrity, prevent algorithmic bias, and maintain holistic empathy toward student learning progressions.
+
+\end{document}
