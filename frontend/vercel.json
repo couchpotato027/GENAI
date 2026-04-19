@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/agent/:match*",
+      "destination": "https://genai-ztl4.onrender.com/agent/:match*"
+    },
+    {
       "source": "/api/:match*",
       "destination": "https://genai-ztl4.onrender.com/:match*"
     }

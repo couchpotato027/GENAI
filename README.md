@@ -1,14 +1,16 @@
-# Intelligent Exam Question Difficulty Predictor
+# Intelligent Exam Question Difficulty Predictor & AI Assessment Assistant
 
 ## Project Description
 
 This system predicts the difficulty level (Easy, Medium, or Hard) of exam questions using classical machine learning. It combines natural language processing of question text with student performance statistics to produce a difficulty classification along with model confidence scores.
 
-The project was built as part of an academic AI/ML course and currently implements Milestone 1 — a complete ML-based prediction pipeline with a deployed web interface. Milestone 2 will extend the system into an agentic pedagogical assistant.
+**Milestone 2** extends this into an **Agentic AI Assessment Design Assistant** that reasons about assessment quality, retrieves pedagogical best practices using RAG, and generates structured improvement suggestions powered by LangGraph and Qwen3-32B via Groq.
 
 ---
 
 ## How the System Works
+
+### Milestone 1: ML Prediction Pipeline
 
 ```
 User enters a question + student scores in the web UI
@@ -28,6 +30,30 @@ Returns: predicted difficulty, confidence %, and score summary
         │
         ▼
 Frontend renders the result alongside offline evaluation metrics
+```
+
+### Milestone 2: Agentic Assessment Pipeline
+
+```
+User clicks "Run AI Assessment Analysis" in the AI Assistant panel
+        │
+        ▼
+Frontend sends POST /agent/analyze to FastAPI
+        │
+        ▼
+LangGraph pipeline executes 6 sequential nodes:
+        │
+  1. Input Node — validates question + scores
+  2. ML Analysis Node — calls existing predict_difficulty()
+  3. Interpretation Node — rule-based reasoning about WHY
+  4. RAG Retriever Node — queries FAISS for pedagogy docs
+  5. LLM Reasoning Node — Groq/Qwen3-32B generates insights
+  6. Output Formatter Node — validates structured JSON
+        │
+        ▼
+Returns structured report: summary, difficulty analysis,
+learning gaps, question issues, recommendations,
+pedagogical references, ethical notice
 ```
 
 ### ML Pipeline Overview
@@ -71,6 +97,42 @@ The model may produce the same difficulty prediction for an empty question with 
 
 ---
 
+## Agentic Assessment Pipeline (Milestone 2)
+
+### Agent Architecture
+
+The agentic pipeline uses **LangGraph** with explicit state management. Six nodes execute sequentially:
+
+| Node | Function | Technology |
+|:---|:---|:---|
+| Input Node | Validates question text and scores | Python |
+| ML Analysis Node | Runs existing `predict_difficulty()` | Scikit-learn |
+| Interpretation Node | Rule-based reasoning about prediction drivers | Python (deterministic) |
+| RAG Retriever Node | Queries FAISS index for pedagogy best practices | FAISS + sentence-transformers |
+| LLM Reasoning Node | Generates structured improvement suggestions | Groq API / Qwen3-32B |
+| Output Formatter Node | Validates and normalizes the final report | Python |
+
+### RAG Knowledge Base
+
+The system includes a curated knowledge base covering:
+- Bloom's Taxonomy (all 6 cognitive levels)
+- MCQ design best practices
+- Common question flaws (ambiguity, guessing cues, poor distractors)
+- Difficulty calibration strategies
+- Assessment fairness and bias avoidance
+- Item discrimination and statistical quality indicators
+
+Documents are chunked, embedded using `all-MiniLM-L6-v2`, and indexed in FAISS for fast retrieval.
+
+### Responsible AI
+
+- All outputs include an ethical disclaimer
+- Recommendations are grounded in retrieved pedagogical documents
+- The system explicitly states when predictions are driven by numeric features
+- A rule-based fallback ensures the system works even without LLM access
+
+---
+
 ## Evaluation Metrics
 
 The model is evaluated offline using standard classification metrics:
@@ -95,8 +157,68 @@ These metrics are displayed in the frontend's Model Evaluation section so users 
 | Backend API          | FastAPI + Uvicorn                   |
 | Frontend             | HTML, CSS, JavaScript               |
 | Model Persistence    | Joblib                              |
+| Agent Framework      | LangGraph                           |
+| Vector Store / RAG   | FAISS + sentence-transformers       |
+| LLM                  | Qwen3-32B via Groq API             |
 | Backend Deployment   | Render (free tier)                  |
 | Frontend Deployment  | Vercel                              |
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|:---|:---|:---|
+| GET | `/` | Health check |
+| POST | `/predict` | ML difficulty prediction (Milestone 1) |
+| POST | `/agent/analyze` | Full agentic assessment analysis (Milestone 2) |
+
+### Example Request (Agent)
+
+```bash
+curl -X POST http://localhost:8000/agent/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "What type of organism is commonly used in preparation of foods such as cheese and yogurt?",
+    "student_scores": "85,90,78,92,88,76,95,80,70,82"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "summary": "This question is classified as 'Easy' with high pass rate...",
+  "difficulty_analysis": "The ML model predicted 'Easy' driven by...",
+  "learning_gaps": ["..."],
+  "question_issues": ["Low discrimination index..."],
+  "recommendations": ["Increase cognitive complexity...", "Revise distractors..."],
+  "pedagogical_references": ["Bloom's Taxonomy: ...", "Item Analysis: ..."],
+  "ethical_notice": "This analysis is provided as decision support...",
+  "ml_metrics": { "predicted_difficulty": "Easy", "confidence": 0.99, ... },
+  "score_dominance": true
+}
+```
+
+---
+
+## Setup Instructions
+
+1. Clone the repository
+2. Create `backend/.env`:
+   ```
+   GROQ_API_KEY=your_groq_api_key_here
+   ```
+3. Install dependencies:
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+4. Run the backend:
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8000
+   ```
+5. Open `frontend/index.html` in a browser (or deploy to Vercel)
 
 ---
 
@@ -111,6 +233,6 @@ These metrics are displayed in the frontend's Model Evaluation section so users 
 
 ## Future Improvements
 
-- **Milestone 2** will extend this system into an agentic pedagogical assistant that reasons about difficulty factors, retrieves best practices using RAG, and generates structured recommendations for educators.
 - Incorporating real student response data would improve model accuracy.
 - Replacing TF-IDF with contextual embeddings (e.g., sentence transformers) could improve text feature quality.
+- Adding multi-turn agent interaction for iterative question improvement.

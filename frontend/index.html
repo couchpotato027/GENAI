@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligent Exam Question Analysis</title>
+    <title>Intelligent Exam Question Analysis & AI Assessment Assistant</title>
     <meta name="description"
-        content="A classical ML-based educational analytics system that predicts exam question difficulty.">
+        content="An ML-based educational analytics system with an agentic AI assessment design assistant powered by LangGraph, RAG, and LLM.">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
@@ -20,12 +20,15 @@
     <nav class="top-nav" id="topNav">
         <div class="nav-left">
             <h1 class="app-title">Intelligent Exam Analysis</h1>
-            <span class="app-subtitle">Milestone 1</span>
+            <span class="app-subtitle">Milestone 1 & 2</span>
         </div>
         <div class="nav-right">
             <div class="mode-toggle">
                 <button class="mode-btn active" id="btnAnalytics" data-mode="analytics">
                     &#9679; Analytics Mode
+                </button>
+                <button class="mode-btn ml2-agentic-btn" id="btnAgentic" data-mode="agentic">
+                    &#9733; AI Assistant
                 </button>
                 <button class="mode-btn" id="btnAboutUs" data-mode="about">
                     &#8505; About Us
@@ -177,19 +180,174 @@
             </section>
         </div>
 
+        <!-- AGENTIC AI ASSISTANT (MILESTONE 2) -->
+        <div class="mode-panel" id="agenticPanel" style="display:none;">
+
+            <!-- Context: Shows what ML already computed -->
+            <section class="section" id="agentContextSection">
+                <div class="section-header">
+                    <h2>&#9733; AI Assessment Assistant</h2>
+                    <p class="section-desc">Agentic analysis powered by LangGraph, RAG, and Qwen3-32B via Groq.</p>
+                </div>
+
+                <!-- No ML data yet message -->
+                <div id="agentNoData" class="agent-no-data">
+                    <p>&#9888; <strong>Run ML Analysis first.</strong> Switch to Analytics Mode, enter a question with
+                        student scores, and run the ML analysis. Then return here for AI-powered assessment insights.</p>
+                </div>
+
+                <!-- ML Context (shown after analysis) -->
+                <div id="agentContext" style="display:none;">
+                    <div class="context-grid">
+                        <div class="context-card">
+                            <span class="context-label">Question Under Analysis</span>
+                            <p class="context-value question-text" id="agentQuestion"></p>
+                        </div>
+                        <div class="context-card">
+                            <div class="context-metrics">
+                                <div class="context-metric">
+                                    <span class="metric-label">Difficulty</span>
+                                    <span class="metric-value" id="agentDifficulty">&mdash;</span>
+                                </div>
+                                <div class="context-metric">
+                                    <span class="metric-label">Confidence</span>
+                                    <span class="metric-value" id="agentConfidence">&mdash;</span>
+                                </div>
+                                <div class="context-metric">
+                                    <span class="metric-label">Avg Score</span>
+                                    <span class="metric-value" id="agentAvgScore">&mdash;</span>
+                                </div>
+                                <div class="context-metric">
+                                    <span class="metric-label">Pass Rate</span>
+                                    <span class="metric-value" id="agentPassRate">&mdash;</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Score Dominance Notice -->
+                    <div class="score-dominance-notice" id="scoreDominanceNotice" style="display:none;">
+                        &#9888; <strong>Score Dominance Detected:</strong> The ML prediction is primarily driven by
+                        student performance statistics, not question text. This is expected behavior in this model.
+                    </div>
+
+                    <button class="btn-primary btn-agentic" id="btnRunAgent">
+                        <span class="btn-icon">&#9733;</span>
+                        Run AI Assessment Analysis
+                    </button>
+                </div>
+            </section>
+
+            <!-- Agent Progress Bar -->
+            <section class="section" id="agentProgressSection" style="display:none;">
+                <div class="progress-bar-container">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="agentProgressFill"></div>
+                    </div>
+                    <span class="progress-label" id="agentProgressLabel">Initializing agent pipeline...</span>
+                </div>
+            </section>
+
+            <!-- Agent Results -->
+            <section class="section" id="agentResultsSection" style="display:none;">
+
+                <!-- Summary Card -->
+                <div class="agent-card" id="agentSummaryCard">
+                    <div class="agent-header" data-target="agentSummaryBody">
+                        <span class="agent-title"><span class="agent-icon">&#128203;</span> Executive Summary</span>
+                        <span class="agent-expand">&#9660;</span>
+                    </div>
+                    <div class="agent-body" id="agentSummaryBody">
+                        <div class="agent-field">
+                            <p class="field-value" id="agentSummaryText"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Difficulty Analysis Card -->
+                <div class="agent-card" id="agentDifficultyCard">
+                    <div class="agent-header" data-target="agentDifficultyBody">
+                        <span class="agent-title"><span class="agent-icon">&#128200;</span> Difficulty Analysis</span>
+                        <span class="agent-expand">&#9660;</span>
+                    </div>
+                    <div class="agent-body" id="agentDifficultyBody">
+                        <div class="agent-field">
+                            <p class="field-value" id="agentDifficultyText"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Gaps Card -->
+                <div class="agent-card" id="agentGapsCard">
+                    <div class="agent-header" data-target="agentGapsBody">
+                        <span class="agent-title"><span class="agent-icon">&#128161;</span> Learning Gaps</span>
+                        <span class="agent-expand">&#9660;</span>
+                    </div>
+                    <div class="agent-body" id="agentGapsBody">
+                        <ul class="issue-list" id="agentGapsList"></ul>
+                    </div>
+                </div>
+
+                <!-- Question Issues Card -->
+                <div class="agent-card" id="agentIssuesCard">
+                    <div class="agent-header" data-target="agentIssuesBody">
+                        <span class="agent-title"><span class="agent-icon">&#9888;</span> Question Issues</span>
+                        <span class="agent-expand">&#9660;</span>
+                    </div>
+                    <div class="agent-body" id="agentIssuesBody">
+                        <ul class="issue-list" id="agentIssuesList"></ul>
+                    </div>
+                </div>
+
+                <!-- Recommendations Card -->
+                <div class="agent-card" id="agentRecsCard">
+                    <div class="agent-header" data-target="agentRecsBody">
+                        <span class="agent-title"><span class="agent-icon">&#10004;</span> Recommendations</span>
+                        <span class="agent-expand">&#9660;</span>
+                    </div>
+                    <div class="agent-body" id="agentRecsBody">
+                        <ol class="improvement-list" id="agentRecsList"></ol>
+                    </div>
+                </div>
+
+                <!-- Pedagogical References Card -->
+                <div class="agent-card" id="agentRefsCard">
+                    <div class="agent-header" data-target="agentRefsBody">
+                        <span class="agent-title"><span class="agent-icon">&#128218;</span> Pedagogical
+                            References</span>
+                        <span class="agent-expand">&#9660;</span>
+                    </div>
+                    <div class="agent-body" id="agentRefsBody">
+                        <ul class="principle-list" id="agentRefsList"></ul>
+                    </div>
+                </div>
+
+                <!-- Ethical Notice -->
+                <div class="ethical-notice" id="agentEthicalNotice">
+                    <span class="ethical-icon">&#9878;</span>
+                    <p id="agentEthicalText"></p>
+                </div>
+
+            </section>
+        </div>
+
         <!-- ABOUT US PAGE -->
         <div class="mode-panel" id="aboutPanel" style="display:none;">
 
             <section class="section about-section">
                 <div class="section-header">
                     <h2>About This Project</h2>
-                    <p class="section-desc">Intelligent Exam Question Analysis &mdash; Milestone 1</p>
+                    <p class="section-desc">Intelligent Exam Question Analysis &mdash; Milestone 1 & 2</p>
                 </div>
                 <p class="about-text">
                     This project is a machine learning-based analytics system that predicts exam question difficulty
                     using classical ML techniques. It accepts exam question text along with student response data,
                     extracts text and numeric features using TF-IDF vectorization and statistical measures,
                     and classifies question difficulty as Easy, Medium, or Hard.
+                    <br><br>
+                    <strong>Milestone 2</strong> extends this into an Agentic AI Assessment Design Assistant that
+                    reasons about question quality, retrieves pedagogical best practices using RAG, and generates
+                    structured improvement suggestions powered by LangGraph and Qwen3-32B via Groq.
                 </p>
                 <div class="about-tech">
                     <div class="tech-tag">Scikit-learn</div>
@@ -198,6 +356,10 @@
                     <div class="tech-tag">Decision Trees</div>
                     <div class="tech-tag">FastAPI</div>
                     <div class="tech-tag">SciQ Dataset</div>
+                    <div class="tech-tag">LangGraph</div>
+                    <div class="tech-tag">FAISS</div>
+                    <div class="tech-tag">Groq / Qwen3</div>
+                    <div class="tech-tag">RAG</div>
                 </div>
             </section>
 
@@ -210,7 +372,7 @@
                     <div class="team-member">
                         <img src="photos/priyansh.jpeg" alt="Priyansh Satija" class="team-photo">
                         <h3>Priyansh Satija</h3>
-                        <p class="team-role">ML Engineer &amp; Backend Developer</p>
+                        <p class="team-role">ML Engineer & Backend Developer</p>
                         <p class="team-desc">
                             Responsible for the core ML pipeline, feature engineering,
                             model training, and the FastAPI backend architecture.
@@ -219,7 +381,7 @@
                     <div class="team-member">
                         <img src="photos/bhavay.jpeg" alt="Bhavay Goyal" class="team-photo">
                         <h3>Bhavay Goyal</h3>
-                        <p class="team-role">Frontend Developer &amp; UI Designer</p>
+                        <p class="team-role">Frontend Developer & UI Designer</p>
                         <p class="team-desc">
                             Responsible for the frontend interface, user experience design,
                             and deployment pipeline for Vercel and Render.
@@ -234,8 +396,8 @@
 
     <!-- FOOTER -->
     <footer class="app-footer">
-        <p>Classical ML-based educational analytics for exam question difficulty prediction.</p>
-        <p>Built with Scikit-learn, TF-IDF, and Logistic Regression.</p>
+        <p>Classical ML-based educational analytics with AI-powered assessment design assistance.</p>
+        <p>Built with Scikit-learn, TF-IDF, LangGraph, FAISS, and Groq/Qwen3-32B.</p>
     </footer>
 
     <script src="app.js"></script>

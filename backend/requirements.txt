@@ -5,3 +5,10 @@ pandas
 scikit-learn
 scipy
 joblib==1.4.2
+# Milestone 2 — Agentic Assessment Pipeline
+python-dotenv
+langgraph
+langchain-core
+groq
+faiss-cpu
+sentence-transformers
